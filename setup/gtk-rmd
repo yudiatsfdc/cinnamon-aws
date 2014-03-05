@@ -1,0 +1,54 @@
+#!/bin/bash
+# GTK+ and Firefox for Amazon Linux
+# Written by Joseph Lawson 2012-06-03
+# http://joekiller.com
+# http://joekiller.com/2012/06/03/install-firefox-on-amazon-linux-x86_64-compiling-gtk/
+ 
+# chmod 755 ./gtk-firefox.sh
+# sudo ./gtk-firefox.sh
+ 
+ 
+TARGET=/usr/local
+ 
+function init()
+{
+export installroot=$TARGET/src
+export workpath=$TARGET
+ 
+#yum --assumeyes install libXdamage-devel libIce-devel libSM-devel libogg-devel libvorbis-devel libtheora-devel
+
+cd $installroot
+PKG_CONFIG_PATH="$workpath/lib/pkgconfig"
+PATH=$workpath/bin:$PATH
+export PKG_CONFIG_PATH PATH
+}
+ 
+function finish()
+{
+     cd $workpath
+     wget -r --no-parent --reject "index.html*" -nH --cut-dirs=7 http://download.cdn.mozilla.net/pub/mozilla.org/firefox/releases/latest/linux-x86_64/en-US/
+     tar xvf firefox*
+     cd bin
+     ln -s ../firefox/firefox
+     ldconfig
+}
+ 
+function install()
+{
+     wget $1
+     FILE=`basename $1`
+     if [ ${FILE: -3} == ".xz" ]
+        then tar xvfJ $FILE
+        else tar xvf $FILE
+     fi
+SHORT=${FILE:0:4}*
+     cd $SHORT
+     ./configure --prefix=$workpath
+     make
+     make install
+     ldconfig
+     cd ..
+}
+ 
+init
+install http://downloads.sourceforge.net/project/recordmydesktop/recordmydesktop/0.3.8.1/recordmydesktop-0.3.8.1.tar.gz
