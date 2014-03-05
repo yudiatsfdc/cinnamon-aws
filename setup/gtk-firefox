@@ -57,7 +57,7 @@ function install()
 SHORT=${FILE:0:4}*
      cd $SHORT
      ./configure --prefix=$workpath
-     make
+     make -j 2
      make install
      ldconfig
      cd ..
